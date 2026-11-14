@@ -271,12 +271,43 @@ const CLIPS = {
 };
 
 // ---------- the stills ----------
-const STILLS = {
-  'board-dark': { path: board, theme: 'dark', label: 'Orbit Checkout · Board', ready: (p) => p.getByRole('button', { name: 'Time travel' }) },
-  'analytics-light': { path: `${board}/analytics`, theme: 'light', label: 'Orbit Checkout · Analytics', ready: (p) => p.locator('.recharts-area').first() },
-  'flow-dark': { path: `${board}/flow`, theme: 'dark', label: 'Orbit Checkout · Flow', ready: (p) => p.locator('main h1').first() },
-  'landing-dark': { path: '/tour', theme: 'dark', label: 'Tessera', ready: (p) => p.locator('h1') },
+// A path can be worked out when the still is taken (the newest bug is the one the paste clip made).
+const newestBug = async () => {
+  const { tickets } = await call('GET', `${board}/tickets?type=bug&sort=newest&limit=1`, null, owner.token);
+  return `${board}/tickets/${tickets[0].key}`;
 };
+const portalPath = async () => new URL((await call('GET', `${board}/portal`, null, owner.token)).portal.url).pathname;
+const main = (p) => p.locator('main h1, [role=main] h1').first();
+const STILLS = {
+  'landing-dark': { path: '/tour', theme: 'dark', label: 'Tessera', ready: (p) => p.locator('h1') },
+  'board-dark': { path: board, theme: 'dark', label: 'Orbit Checkout · Board', ready: (p) => p.getByRole('button', { name: 'Time travel' }) },
+  'ticket-dark': { path: newestBug, theme: 'dark', label: 'Orbit Checkout · A bug from a pasted crash', ready: (p) => p.getByRole('dialog').first() },
+  'list-light': { path: `${board}/list`, theme: 'light', label: 'Orbit Checkout · List', ready: main },
+  'mywork-light': { path: '/my-work', theme: 'light', label: 'Tessera · My work', ready: main },
+  'sprints-dark': { path: `${board}/sprints`, theme: 'dark', label: 'Orbit Checkout · Sprints', ready: main },
+  'timeline-light': { path: `${board}/timeline`, theme: 'light', label: 'Orbit Checkout · Timeline', ready: main },
+  'analytics-light': { path: `${board}/analytics`, theme: 'light', label: 'Orbit Checkout · Analytics', ready: (p) => p.locator('.recharts-area').first() },
+  'flow-dark': { path: `${board}/flow`, theme: 'dark', label: 'Orbit Checkout · Flow', ready: main },
+  'triage-light': { path: `${board}/triage`, theme: 'light', label: 'Orbit Checkout · Triage inbox', ready: main },
+  'portal-light': { path: portalPath, theme: 'light', guest: true, label: 'Report a problem · Orbit Checkout', ready: (p) => p.getByLabel('What happened?') },
+  'settings-dark': { path: `${board}/settings`, theme: 'dark', label: 'Orbit Checkout · Settings', ready: (p) => p.locator('#main section').first() },
+  'phone-board-dark': { path: board, theme: 'dark', phone: true, ready: (p) => p.locator('[data-ticket-card]').first() },
+  'phone-portal-light': { path: portalPath, theme: 'light', guest: true, phone: true, ready: (p) => p.getByLabel('What happened?') },
+};
+
+// A phone screenshot in a phone-shaped frame on the same background as the window frame.
+const PHONE = { w: 390, h: 844 };
+async function composePhone(shot, name) {
+  const { readFileSync } = await import('node:fs');
+  const img = `data:image/png;base64,${readFileSync(shot).toString('base64')}`;
+  const html = `<!doctype html><html><body style="margin:0;width:760px;height:1000px;display:grid;place-items:center;
+    background:#0c0b12;background-image:radial-gradient(60% 70% at 8% 0%, rgb(247 178 59 / 0.16), transparent 60%),
+    radial-gradient(55% 60% at 100% 100%, rgb(139 108 246 / 0.22), transparent 60%)">
+    <div style="padding:12px;border-radius:56px;background:#121119;border:1px solid rgb(255 255 255 / 0.09);
+      box-shadow:0 50px 100px -30px rgb(0 0 0 / 0.75)"><img src="${img}" style="display:block;width:${PHONE.w}px;height:${PHONE.h}px;border-radius:44px"></div>
+  </body></html>`;
+  await still(html, 760, 1000, join(OUT, `${name}.png`));
+}
 
 browser = await chromium.launch({ channel: 'chrome' });
 try {
@@ -288,14 +319,16 @@ try {
   }
   for (const [name, s] of Object.entries(STILLS)) {
     if (!wanted(name)) continue;
-    const rec = await session({ who: owner, theme: s.theme });
-    await rec.page.goto(APP + s.path);
+    const rec = await session({ who: s.guest ? null : owner, theme: s.theme });
+    if (s.phone) await rec.page.setViewportSize({ width: PHONE.w, height: PHONE.h });
+    await rec.page.goto(APP + (typeof s.path === 'function' ? await s.path() : s.path));
     await s.ready(rec.page).waitFor({ timeout: 20000 });
     await pause(rec.page, 1800);
     const shot = join(TMP, `${name}.png`);
     await rec.page.screenshot({ path: shot });
     await rec.context.close();
-    await compose(shot, name, s.label);
+    if (s.phone) await composePhone(shot, name);
+    else await compose(shot, name, s.label);
     console.log('still', name);
   }
 } finally {

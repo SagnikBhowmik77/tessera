@@ -92,6 +92,19 @@ for (const [i, [title, type, priority]] of TITLES.entries()) {
 // A WIP limit, set after the moves (it would refuse them, as it should).
 await call('PUT', `${base}/statuses`, { statuses: (await call('GET', base, null, owner.token)).project.statuses.map(({ key, name, category }) => ({ key, name, category, ...(key === 'in_progress' && { wipLimit: 3 }) })) }, owner.token);
 
+// Planning: a running two-week sprint, a milestone, and start/due dates around today, so the
+// sprints page, timeline and calendar have something real to show.
+const dayFrom = (offset) => new Date(Date.now() + offset * 86_400_000).toISOString().slice(0, 10);
+const { tickets: open } = await call('GET', `${base}/tickets?open=true&sort=number&limit=100`, null, owner.token);
+const sprint = (await call('POST', `${base}/sprints`, { name: 'Sprint 7: faster checkout', goal: 'Ship express checkout and fix the payment crashes', startDate: dayFrom(-6), endDate: dayFrom(8) }, owner.token)).sprint;
+const milestone = (await call('POST', `${base}/milestones`, { name: 'Checkout v2', description: 'Express checkout, Apple Pay and saved cards', dueDate: dayFrom(24) }, owner.token)).milestone;
+for (const [i, t] of open.slice(0, 12).entries()) {
+  await call('PUT', `${base}/tickets/${t.number}/sprint`, { sprint: sprint.id }, owner.token);
+  await call('PATCH', `${base}/tickets/${t.number}`, { startDate: dayFrom(-6 + (i % 5) * 2), dueDate: dayFrom(-2 + i * 2) }, owner.token);
+  if (i % 3 === 0) await call('PUT', `${base}/tickets/${t.number}/milestone`, { milestone: milestone.id }, owner.token);
+}
+await call('POST', `${base}/sprints/${sprint.id}/start`, {}, owner.token);
+
 // Move every ticket's history back: created 3 to 62 days ago, each later event a while after.
 const DAY = 86_400_000; const now = Date.now();
 const all = await Ticket.find({ project: new Types.ObjectId(p.id) }).lean();

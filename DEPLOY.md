@@ -11,8 +11,20 @@ MongoDB Atlas cluster (database `tessera`). Everything below is free. After the 
 | API | Render, service `tessera-api` (free, Singapore) | `render.yaml` |
 | Database | MongoDB Atlas, Cluster0, database `tessera` | access list already has `0.0.0.0/0` (Spendwise) |
 
-`<api>` below is the Render address (`https://tessera-api-xxxx.onrender.com`) and `<web>` the Vercel
-one (`https://tessera-xxxx.vercel.app`). Both names are assigned when the services are created.
+Live since 14 November 2026:
+
+| Part | Address | Dashboard |
+|---|---|---|
+| Web app + relay | https://tessera-eight-gamma.vercel.app | Vercel, team Profff, project `tessera` |
+| API | https://tessera-api-7hwj.onrender.com | Render, workspace Creative, Blueprint `tessera`, service `tessera-api` |
+| GitHub sign-in | OAuth app "Tessera" (production) | github.com/settings/applications |
+| Google sign-in | client "Tessera local" (both callbacks) | Google Cloud project `tessera-514206` |
+
+Below, `<api>` is the Render address and `<web>` the Vercel one, as in the table.
+
+Two things learned on the first setup: Vercel's import created the project but no deployment (use
+Deployments > Create Deployment > `main`), and after secret variables change, Vercel asks for the
+account's two-factor code before it will deploy.
 
 ## 1. GitHub
 
