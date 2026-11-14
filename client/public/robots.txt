@@ -1,0 +1,8 @@
+# Tessera. Report pages and roadmaps can be found; private links (tracking pages, shared boards,
+# invites) are only for the people they were sent to, so they are never crawled.
+User-agent: *
+Disallow: /track/
+Disallow: /shared/
+Disallow: /invite/
+Disallow: /api/
+Allow: /

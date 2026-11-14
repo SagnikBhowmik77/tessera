@@ -1,0 +1,28 @@
+// Importing this registers every model, so connectDb() can build all their indexes.
+export { User, THEMES, DENSITIES, BOARD_LANES } from './User.js';
+export { Session } from './Session.js';
+export { EmailToken } from './EmailToken.js';
+export { Project, ROLES, STATUS_CATEGORIES, DEFAULT_STATUSES, PORTAL_ACCENTS } from './Project.js';
+export { ProjectInvite } from './ProjectInvite.js';
+export { Ticket, TICKET_TYPES, PRIORITIES } from './Ticket.js';
+export { TicketEvent, EVENT_TYPES } from './TicketEvent.js';
+export { Comment } from './Comment.js';
+export { Attachment } from './Attachment.js';
+export { SavedFilter } from './SavedFilter.js';
+export { Notification, NOTIFICATION_TYPES } from './Notification.js';
+export { TicketVisit, Snooze } from './Follow.js';
+export { Sprint, SPRINT_STATES } from './Sprint.js';
+export { Milestone } from './Milestone.js';
+export { Leave } from './Leave.js';
+export { Template, Recurrence } from './Template.js';
+export { Rule, RULE_TRIGGERS, RULE_ACTIONS } from './Rule.js';
+export { AuditEntry } from './AuditEntry.js';
+export { ErrorOccurrence } from './ErrorOccurrence.js';
+export { SourceMap } from './SourceMap.js';
+export { RepoInsight } from './RepoInsight.js';
+export { Deployment } from './Deployment.js';
+export { PokerRound, Retro, Incident, RETRO_COLUMNS } from './Live.js';
+export { Tracker, RoadmapVote, PortalLogo } from './Outside.js';
+export { TestRun } from './TestRun.js';
+export { ApiToken, WebhookDelivery } from './Integrations.js';
+export { Workspace, PushSubscription, WORKSPACE_ROLES } from './Platform.js';

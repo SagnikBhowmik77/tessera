@@ -1,0 +1,295 @@
+/* Effects the design system needs that utilities can't express on their own. */
+
+@layer components {
+  /* The page background: canvas plus a faint film grain (an inline SVG noise, no network). */
+  .ds-canvas {
+    background-color: var(--c-canvas);
+    color: var(--c-fg);
+    font-family: var(--font-ui);
+    font-feature-settings: 'ss01', 'cv11';
+    position: relative;
+    isolation: isolate;
+  }
+  .ds-canvas::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: var(--grain-opacity);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+
+  /* Light that follows the pointer across a card (set by the Card component). */
+  .ds-spotlight { position: relative; }
+  .ds-spotlight::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--dur-base) var(--motion-out);
+    background: radial-gradient(320px circle at var(--mx, 50%) var(--my, 50%), var(--spotlight), transparent 70%);
+  }
+  .ds-spotlight:hover::after { opacity: 1; }
+
+  /* Loading placeholder: a slow sheen, a still block when motion is reduced. */
+  .ds-skeleton {
+    background: linear-gradient(90deg, var(--c-hover) 0%, var(--c-press) 50%, var(--c-hover) 100%);
+    background-size: 200% 100%;
+    animation: ds-sheen 1.6s var(--motion-in-out) infinite;
+  }
+
+  /* A mosaic tile being set: a short drop with the colour arriving. */
+  .ds-tile-set { animation: ds-set var(--dur-set) var(--motion-spring) both; }
+
+  /* Small arrivals without the motion library: an icon popping in, a tooltip rising. */
+  .ds-pop { animation: ds-pop var(--dur-base) var(--motion-spring) both; }
+  .ds-rise { animation: ds-rise var(--dur-fast) var(--motion-out) both; }
+  .ds-drop { animation: ds-drop var(--dur-fast) var(--motion-out) both; transform-origin: top; }
+  .ds-fade { animation: ds-fade var(--dur-base) var(--motion-out) both; }
+  .ds-drawer { animation: ds-drawer var(--dur-slow) var(--motion-out) both; }
+  .ds-drawer-right { animation: ds-drawer-right var(--dur-slow) var(--motion-out) both; }
+  .ds-panel { animation: ds-panel var(--dur-slow) var(--motion-spring) both; }
+  /* A card that has just landed in a done column: the glow arrives, then settles. */
+  /* A card dropped into Done: it lands a touch high, settles into its slot and the glass lights up
+     (560 ms, under the 600 ms ceiling for signature moments). */
+  .ds-just-done { animation: ds-just-done 560ms var(--motion-out) both; }
+
+  /* Scrollbars that stay out of the way. */
+  .ds-scroll { scrollbar-width: thin; scrollbar-color: var(--c-line-strong) transparent; }
+
+  /* Charts: a glass tooltip over the plot, and every number on an axis or label in tabular
+     figures so ticks line up and values don't wobble as they change. */
+  .ds-chart-tip {
+    border-radius: var(--radius-tile);
+    background: color-mix(in oklab, var(--c-overlay) 86%, transparent);
+    -webkit-backdrop-filter: blur(14px) saturate(1.4);
+    backdrop-filter: blur(14px) saturate(1.4);
+    box-shadow: var(--elev-overlay);
+  }
+  .recharts-wrapper text,
+  .recharts-tooltip-wrapper { font-variant-numeric: tabular-nums; }
+  /* A chart takes focus so its values can be read with the arrow keys (Recharts' keyboard
+     layer): it shows the same focus ring as everything else. */
+  .recharts-wrapper .recharts-surface:focus { outline: none; }
+  .recharts-wrapper .recharts-surface:focus-visible { outline: 2px solid var(--c-focus); outline-offset: 4px; border-radius: var(--radius-tile); }
+  /* A meter bar filling in from the left once (met rates, progress). */
+  .ds-meter { transform-origin: left; animation: ds-meter 720ms var(--motion-out) both; }
+
+  /* The time-travel scrubber: a native range input (keyboard, screen readers and touch for free)
+     drawn as a thin track with a glass handle, laid over the chart of the board's size. */
+  .ds-scrub { appearance: none; -webkit-appearance: none; background: transparent; cursor: pointer; }
+  .ds-scrub::-webkit-slider-runnable-track { height: 100%; background: transparent; }
+  .ds-scrub::-moz-range-track { height: 100%; background: transparent; }
+  .ds-scrub::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 100%;
+    border-radius: 7px;
+    background: color-mix(in oklab, var(--c-chart-done) 22%, transparent);
+    box-shadow: inset 0 0 0 2px var(--c-chart-done), 0 0 0 3px var(--c-surface);
+  }
+  .ds-scrub::-moz-range-thumb {
+    width: 14px; height: 100%;
+    border: 0;
+    border-radius: 7px;
+    background: color-mix(in oklab, var(--c-chart-done) 22%, transparent);
+    box-shadow: inset 0 0 0 2px var(--c-chart-done), 0 0 0 3px var(--c-surface);
+  }
+  .ds-scrub:focus-visible { outline: 2px solid var(--c-focus); outline-offset: 3px; border-radius: var(--radius-tile); }
+
+  /* A plain slider: a thin track filled up to the value (set --fill: 0%..100% inline) and a round
+     handle. The focus ring goes on the handle, where the eye already is. */
+  .ds-range { appearance: none; -webkit-appearance: none; background: transparent; cursor: pointer; height: 20px; }
+  .ds-range::-webkit-slider-runnable-track {
+    height: 4px; border-radius: 9999px;
+    background: linear-gradient(to right, var(--c-key) 0 var(--fill, 50%), var(--c-line-strong) var(--fill, 50%));
+  }
+  .ds-range::-moz-range-track { height: 4px; border-radius: 9999px; background: var(--c-line-strong); }
+  .ds-range::-moz-range-progress { height: 4px; border-radius: 9999px; background: var(--c-key); }
+  .ds-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px; height: 16px; margin-top: -6px;
+    border-radius: 9999px;
+    background: var(--c-surface);
+    box-shadow: inset 0 0 0 2px var(--c-key), var(--elev-raised);
+    transition: scale var(--dur-fast) var(--motion-out);
+  }
+  .ds-range::-moz-range-thumb {
+    width: 16px; height: 16px; border: 0; border-radius: 9999px;
+    background: var(--c-surface);
+    box-shadow: inset 0 0 0 2px var(--c-key), var(--elev-raised);
+  }
+  .ds-range:active::-webkit-slider-thumb { scale: 1.15; }
+  .ds-range:focus-visible { outline: none; }
+  .ds-range:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--c-focus); outline-offset: 2px; }
+  .ds-range:focus-visible::-moz-range-thumb { outline: 2px solid var(--c-focus); outline-offset: 2px; }
+}
+
+/* One focus style everywhere: an outline (never clashes with the elevation shadows), with a gap.
+   A utility, so other classes can @apply it. */
+@utility ds-focus {
+  &:focus-visible { outline: 2px solid var(--c-focus); outline-offset: var(--focus-offset, 2px); }
+}
+@utility ds-focus-within {
+  &:has(:focus-visible) { outline: 2px solid var(--c-focus); outline-offset: var(--focus-offset, 2px); }
+}
+/* Inside a scrolling list the outline goes inward so it isn't clipped. */
+@utility ds-focus-inset { --focus-offset: -2px; }
+
+/* The brand gradient, used only on the logo, the primary action, focus and "done".
+   Utilities (not components) so variants work: checked:ds-gradient, hover:ds-gradient-text. */
+@utility ds-gradient { background-image: var(--gradient); }
+@utility ds-gradient-text {
+  background-image: var(--gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@keyframes ds-pop { from { opacity: 0; transform: scale(0.5); } }
+@keyframes ds-rise { from { opacity: 0; translate: -50% 3px; } }
+
+@keyframes ds-drop { from { opacity: 0; transform: translateY(-4px) scale(0.98); } }
+@keyframes ds-fade { from { opacity: 0; } }
+@keyframes ds-meter { from { transform: scaleX(0); } }
+@keyframes ds-drawer { from { transform: translateX(-100%); } }
+@keyframes ds-drawer-right { from { transform: translateX(100%); } }
+@keyframes ds-panel { from { opacity: 0; transform: translateY(16px) scale(0.97); } }
+@keyframes ds-just-done {
+  0% { transform: translateY(-5px) scale(1.025); box-shadow: var(--elev-lift); }
+  45% { transform: translateY(1px) scale(0.995); box-shadow: var(--glow-done), 0 0 36px -6px var(--brand-violet); }
+  100% { transform: none; box-shadow: var(--glow-done); }
+}
+
+@keyframes ds-sheen { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+@keyframes ds-set {
+  from { transform: translateY(-6px) scale(0.86); opacity: 0; filter: saturate(0); }
+  to { transform: none; opacity: 1; filter: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ds-skeleton, .ds-tile-set, .ds-pop, .ds-rise, .ds-drop, .ds-fade, .ds-drawer, .ds-drawer-right, .ds-panel, .ds-meter { animation: none; }
+  .ds-just-done { animation: none; box-shadow: var(--glow-done); }
+  .ds-spotlight::after { display: none; }
+}
+
+/* A primary button that can't be used yet reads as a quiet, empty slot, not a faded gradient
+   (a faded gradient looks muddy on both themes). While it is busy it keeps its colour. */
+@utility ds-btn-primary {
+  &:disabled:not([aria-busy]) {
+    background-image: none;
+    background-color: var(--c-sunken);
+    color: var(--c-fg-subtle);
+    box-shadow: inset 0 0 0 1px var(--c-line);
+    opacity: 1;
+  }
+}
+
+/* Public pages: a wash of the brand light falling from the top, as if through a window above.
+   Two colours from the gradient at low strength; stronger in dark, where light reads as glow. */
+.ds-public-light::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 28rem;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(40rem 18rem at 30% -4rem, color-mix(in oklab, var(--c-accent) var(--public-light), transparent), transparent 70%),
+    radial-gradient(36rem 16rem at 72% -6rem, color-mix(in oklab, var(--c-key) var(--public-light), transparent), transparent 70%);
+}
+:root { --public-light: 10%; }
+.dark { --public-light: 16%; }
+
+/* A page that wears a team's accent (portal branding; the steps come from lib/accents.js and are
+   contrast-checked there). Links, focus rings, selected cards, the primary button and the light
+   falling on the page all take the accent; everything else stays Tessera. */
+.ds-accented[style*='--accent-light'] {
+  --accent: var(--accent-light);
+  --c-key: var(--accent);
+  --c-key-bg: color-mix(in oklab, var(--accent) 8%, transparent);
+  --c-key-line: color-mix(in oklab, var(--accent) 36%, transparent);
+  --c-focus: var(--accent);
+  --c-accent: var(--accent);
+  --gradient: linear-gradient(135deg, var(--accent), color-mix(in oklab, var(--accent) 82%, black));
+  --on-gradient: #FFFFFF;
+}
+.dark .ds-accented[style*='--accent-light'],
+.dark.ds-accented[style*='--accent-light'] {
+  --accent: var(--accent-dark);
+  --gradient: linear-gradient(135deg, var(--accent), color-mix(in oklab, var(--accent) 86%, white));
+  --on-gradient: #0E0D14;
+}
+
+/* Empty-state tiles lean towards the cursor: the grid tips like a pane of glass, the middle tile
+   rises a little more than the rest. Only for a fine pointer with motion allowed; it settles back
+   when the pointer leaves. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .ds-tilt {
+    --tx: 0;
+    --ty: 0;
+    perspective: 420px;
+    padding: 0.5rem;
+    margin: -0.5rem -0.5rem 1rem;
+  }
+  .ds-tilt > * {
+    transition: transform 420ms var(--motion-out), box-shadow 420ms var(--motion-out);
+    transform: rotateX(calc(var(--ty) * -9deg)) rotateY(calc(var(--tx) * 9deg)) translateZ(0);
+  }
+  .ds-tilt > :nth-child(5) {
+    transform: rotateX(calc(var(--ty) * -12deg)) rotateY(calc(var(--tx) * 12deg)) translateZ(18px);
+  }
+  .ds-tilt:hover > :nth-child(5) { box-shadow: var(--elev-lift); }
+}
+
+/* The card-to-drawer morph (lib/viewTransition.js). Only the ticket moves; the page behind it
+   just cross-fades. The card's picture fades out early and the drawer's fades in, both pinned to
+   the top-left, so text never stretches while the box grows. 420 ms. */
+::view-transition-group(ticket) { animation-duration: 420ms; animation-timing-function: var(--motion-out); }
+::view-transition-old(ticket), ::view-transition-new(ticket) { height: 100%; object-fit: cover; object-position: left top; }
+::view-transition-old(ticket) { animation: 140ms ease-out both vt-out; }
+::view-transition-new(ticket) { animation: 260ms ease-out 60ms both vt-in; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 200ms; }
+[data-vt] .ds-drawer-right { animation: none; }
+@keyframes vt-out { to { opacity: 0; } }
+@keyframes vt-in { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+}
+
+/* Live collaboration. Soft and short; all still for reduced motion.
+   Presence: a ring that breathes out from someone who is here now. */
+.ds-presence::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  pointer-events: none;
+  animation: ds-presence 2.6s var(--motion-out) infinite;
+}
+@keyframes ds-presence {
+  0% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--c-key) 55%, transparent); }
+  70%, 100% { box-shadow: 0 0 0 6px transparent; }
+}
+/* A card a teammate has picked up: their ring, and the card steps back a little. */
+.ds-held { box-shadow: 0 0 0 2px var(--c-key-line), var(--elev-raised); opacity: 0.82; }
+/* A card someone else just changed: a short glow that fades (900 ms). */
+.ds-live-flash { animation: ds-live-flash 900ms var(--motion-out) both; }
+@keyframes ds-live-flash {
+  0% { box-shadow: 0 0 0 2px var(--c-key), 0 0 24px -6px var(--c-key); }
+  100% { box-shadow: var(--elev-raised); }
+}
+/* Typing: three small panes of glass rising in turn. */
+.ds-typing > span { animation: ds-typing 1.1s var(--motion-in-out) infinite; }
+.ds-typing > span:nth-child(2) { animation-delay: 150ms; }
+.ds-typing > span:nth-child(3) { animation-delay: 300ms; }
+@keyframes ds-typing {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.45; }
+  30% { transform: translateY(-3px); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ds-presence::after, .ds-typing > span, .ds-live-flash { animation: none; }
+}

@@ -1,0 +1,149 @@
+@import 'tailwindcss';
+@import './ds/tokens.css';
+@import './ds/surfaces.css';
+
+@custom-variant dark (&:where(.dark, .dark *));
+/* Compact density (a personal preference): tighter cards, rows and lists. compact:p-2 etc. */
+@custom-variant compact (&:where([data-density=compact] *));
+
+/* Design system "Stained Glass": fixed scales. Theme colours are mapped below (inline, so a
+   utility like bg-surface follows the light/dark variables in ds/tokens.css). */
+@theme {
+  --font-display: 'Instrument Serif', 'Iowan Old Style', Georgia, serif;
+  --font-ui: 'Geist Variable', 'Noto Sans Bengali', 'Nirmala UI', ui-sans-serif, system-ui, sans-serif;
+  --font-code: 'Geist Mono Variable', ui-monospace, 'Cascadia Code', Menlo, Consolas, monospace;
+
+  --text-display: 3rem;        --text-display--line-height: 1;
+  --text-title: 2rem;          --text-title--line-height: 1.1;
+  --text-h1: 1.5rem;           --text-h1--line-height: 1.25;
+  --text-h2: 1.125rem;         --text-h2--line-height: 1.35;
+  --text-h3: 0.9375rem;        --text-h3--line-height: 1.4;
+  --text-body: 0.875rem;       --text-body--line-height: 1.5;
+  --text-small: 0.8125rem;     --text-small--line-height: 1.45;
+  --text-caption: 0.75rem;     --text-caption--line-height: 1.4;
+  --text-micro: 0.6875rem;     --text-micro--line-height: 1.3;
+
+  --radius-shard: 2px;         /* mosaic cells */
+  --radius-hair: 4px;          /* chips, keys, checkboxes */
+  --radius-tile: 6px;
+  --radius-card: 10px;
+  --radius-panel: 16px;
+}
+
+@theme inline {
+  --color-canvas: var(--c-canvas);
+  --color-sunken: var(--c-sunken);
+  --color-surface: var(--c-surface);
+  --color-raised: var(--c-raised);
+  --color-overlay: var(--c-overlay);
+  --color-line: var(--c-line);
+  --color-line-strong: var(--c-line-strong);
+  --color-fg: var(--c-fg);
+  --color-fg-muted: var(--c-fg-muted);
+  --color-fg-subtle: var(--c-fg-subtle);
+  --color-fg-faint: var(--c-fg-faint);
+  --color-key: var(--c-key);
+  --color-key-bg: var(--c-key-bg);
+  --color-key-line: var(--c-key-line);
+  --color-accent: var(--c-accent);
+  --color-accent-soft: var(--c-accent-soft);
+  --color-focus: var(--c-focus);
+  --color-hover: var(--c-hover);
+  --color-press: var(--c-press);
+  --color-field: var(--c-field);
+  --color-status-todo: var(--c-status-todo);
+  --color-status-progress: var(--c-status-progress);
+  --color-status-done: var(--c-status-done);
+  --color-prio-critical: var(--c-prio-critical);
+  --color-prio-high: var(--c-prio-high);
+  --color-prio-medium: var(--c-prio-medium);
+  --color-prio-low: var(--c-prio-low);
+  --color-success: var(--c-success);
+  --color-warning: var(--c-warning);
+  --color-danger: var(--c-danger);
+  --color-info: var(--c-info);
+  --color-epic: var(--c-epic);
+  --color-on-gradient: var(--on-gradient);
+  --color-on-glass: var(--on-glass);
+
+  --shadow-surface: var(--elev-surface);
+  --shadow-raised: var(--elev-raised);
+  --shadow-lift: var(--elev-lift);
+  --shadow-overlay: var(--elev-overlay);
+  --shadow-done: var(--glow-done);
+  --shadow-ring: var(--ring);
+
+  --ease-glass: var(--motion-out);
+  --ease-glass-spring: var(--motion-spring);
+}
+
+@theme {
+  --font-sans: var(--font-ui); /* Tailwind's default sans is the UI face (Geist); nothing loads Inter */
+  --font-mono: ui-monospace, 'Cascadia Code', SFMono-Regular, Menlo, Consolas, monospace;
+  --color-ink: #0c0b12;
+  --color-panel: #14131d;
+  --color-panel-2: #1b1a27;
+  --color-brand-50: #f3f1ff;
+  --color-brand-100: #e8e4ff;
+  --color-brand-300: #b9b0fb;
+  --color-brand-400: #a294f9;
+  --color-brand-500: #8b7cf6;
+  --color-brand-600: #7462ec;
+  --color-brand-700: #5e4bd2;
+}
+
+html { color-scheme: light; }
+html.dark { color-scheme: dark; }
+
+body {
+  background-color: var(--c-canvas);
+  color: var(--c-fg);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'ss01', 'cv11';
+}
+
+::selection { background-color: var(--c-selection); }
+
+/* The first shared classes, now drawn from the design system tokens, so screens and panels that
+   still use them look like the rest (they move to ds components as each screen is redesigned). */
+@layer components {
+  .card { @apply rounded-card bg-surface shadow-surface; }
+  .label { @apply block text-caption font-medium text-fg-muted; }
+
+  .btn {
+    @apply ds-focus inline-flex h-9 shrink-0 select-none items-center justify-center gap-2 rounded-tile px-3.5 text-small font-medium
+      transition-[color,background-color,box-shadow,filter,scale] duration-(--dur-fast) ease-glass active:scale-97 disabled:pointer-events-none disabled:opacity-45;
+  }
+  .btn-sm { @apply h-7 gap-1.5 px-2.5 text-caption; }
+  .btn-icon { @apply size-9 px-0; }
+  .btn-primary { @apply ds-btn-primary ds-gradient text-on-gradient shadow-raised hover:brightness-110; }
+  .btn-secondary { @apply bg-raised text-fg shadow-raised hover:shadow-lift; }
+  .btn-ghost { @apply text-fg-muted hover:bg-hover hover:text-fg; }
+  .btn-danger { @apply bg-danger/12 text-danger hover:bg-danger/20; }
+
+  .input {
+    @apply ds-focus h-9 w-full rounded-tile border border-line-strong bg-field px-3 text-small text-fg placeholder:text-fg-subtle
+      transition-[border-color,background-color] duration-(--dur-fast) hover:border-fg-faint aria-invalid:border-danger
+      disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  textarea.input { @apply h-auto py-2 leading-relaxed; }
+  select.input { @apply pr-8; }
+
+  .mention { @apply rounded-hair bg-key-bg px-1 font-medium text-key; }
+
+  .markdown { @apply text-small leading-relaxed text-fg-muted; overflow-wrap: anywhere; }
+  .markdown > * + * { @apply mt-2.5; }
+  .markdown h1, .markdown h2, .markdown h3 { @apply font-semibold text-fg; }
+  .markdown h1 { @apply text-h2; } .markdown h2 { @apply text-h3; } .markdown h3 { @apply text-small; }
+  .markdown a { @apply text-fg underline decoration-line-strong underline-offset-4 hover:decoration-fg; }
+  .markdown ul { @apply list-disc pl-5; } .markdown ol { @apply list-decimal pl-5; }
+  .markdown code { @apply rounded-hair border border-line bg-hover px-1 py-0.5 font-code text-caption text-fg; }
+  .markdown pre { @apply max-h-80 overflow-auto rounded-card border border-line bg-sunken p-3 font-code text-caption leading-5 text-fg; }
+  .markdown pre code { @apply border-0 bg-transparent p-0 text-inherit; }
+  .markdown blockquote { @apply border-l-2 border-line-strong pl-3 text-fg-subtle; }
+  .markdown strong { @apply font-semibold text-fg; }
+}
+
+/* Thin scrollbars (older name for ds-scroll). */
+.scroll-thin { scrollbar-width: thin; scrollbar-color: var(--c-line-strong) transparent; }

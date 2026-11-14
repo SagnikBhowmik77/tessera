@@ -1,0 +1,14 @@
+{
+  "name": "tessera-e2e",
+  "private": true,
+  "type": "module",
+  "description": "Browser tests for Tessera (Playwright): the real app against a throwaway in-memory database.",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
+    "@playwright/test": "1.59.1",
+    "lighthouse": "13.6.0"
+  }
+}

@@ -1,0 +1,151 @@
+/*
+  Tessera design tokens, direction A "Stained Glass".
+  Deep ink with colour only where light passes through. Dark is the default look; light has the
+  same structure and quality. The values that change with the theme live here; the fixed scales
+  (fonts, type sizes, radius) are in the @theme block of index.css, which also maps every colour
+  below to a Tailwind name (bg-surface, text-fg-muted, border-line, ...).
+
+  Levels (back to front): canvas → surface → raised → overlay. Each has its own fill, border and
+  shadow. Colour is reserved for status, priority, focus and the brand gradient.
+*/
+
+:root {
+  /* ---- Motion ---- */
+  --dur-instant: 80ms;
+  --dur-fast: 140ms;
+  --dur-base: 220ms;
+  --dur-slow: 360ms;
+  --dur-set: 560ms;           /* the "tile is set" moment */
+  --motion-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --motion-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+
+  /* ---- Brand (same in both themes) ---- */
+  --brand-amber: #F7B23B;
+  --brand-rose: #F2557D;
+  --brand-violet: #8B6CF6;
+  --gradient: linear-gradient(135deg, var(--brand-amber) 0%, var(--brand-rose) 48%, var(--brand-violet) 100%);
+  --on-gradient: #14111A;     /* text on the gradient; passes AA on all of it */
+  --on-glass: #14111A;        /* initials on avatar and project-tile fills; never changed by an accent */
+
+  /* Avatar fills (initials are --on-glass ink; every fill passes AA with it). */
+  --avatar-sky: #6CC6EC;
+  --avatar-mint: #6FD6A8;
+  --avatar-orchid: #E3A4F0;
+
+  /* ---- Light theme (when the page is not .dark) ---- */
+  --c-canvas: #F6F5F1;
+  --c-sunken: #EEECE6;
+  --c-surface: #FFFFFF;
+  --c-raised: #FFFFFF;
+  --c-overlay: #FFFFFF;
+  --c-line: rgba(20, 18, 30, 0.08);
+  --c-line-strong: rgba(20, 18, 30, 0.16);
+  --c-fg: #17161D;
+  --c-fg-muted: #4F4D5B;
+  --c-fg-subtle: #64626F;
+  --c-fg-faint: #9896A3;      /* decoration and disabled only, never body text */
+  --c-key: #5B43D6;           /* ticket keys */
+  --c-key-bg: #F1EEFF;
+  --c-key-line: #E0D9FF;
+  --c-accent: #C2305A;        /* accent text and icons */
+  --c-accent-soft: rgba(242, 85, 125, 0.1);
+  --c-focus: #6D4FE0;
+  --c-selection: rgba(139, 108, 246, 0.22);
+  --c-hover: rgba(20, 18, 30, 0.045);
+  --c-press: rgba(20, 18, 30, 0.08);
+  --c-field: #FFFFFF;          /* inputs, selects, textareas */
+
+  --c-status-todo: #6F6D7A;
+  --c-status-progress: #9E6304;
+  --c-status-done: #6D4FE0;
+  --c-prio-critical: #D3335E;
+  --c-prio-high: #B4500C;
+  --c-prio-medium: #886800;
+  --c-prio-low: #8A8896;
+  --c-success: #11785A;
+  --c-warning: #9A6200;
+  --c-danger: #C4244C;
+  --c-info: #3866D0;
+  --c-epic: #9C3BA8;           /* epics and milestones: 5.8:1 on surface, 5.3:1 on canvas */
+
+  /* Chart fills for the status categories and ticket types: the same hues as the badges, stepped
+     for filled marks and checked with the dataviz validator against the surface (2026-11-13).
+     Status, light: to-do is a lighter neutral so it parts from amber (normal ΔE 16.8, CVD 16.0).
+     Types run bug, feature, task so red never sits beside green (worst CVD ΔE 19.6). Priorities
+     are an ordinal warm scale that colour alone can't separate, so charts show them only as
+     labelled rows with their icon. */
+  --c-chart-todo: #8F8D9C;
+  --c-chart-progress: #9E6304;
+  --c-chart-done: #6D4FE0;
+  --c-chart-bug: #C4244C;
+  --c-chart-feature: #3866D0;
+  --c-chart-task: #11785A;
+
+  --elev-surface: 0 0 0 1px var(--c-line);
+  --elev-raised: 0 0 0 1px var(--c-line), 0 1px 2px rgba(23, 22, 29, 0.05), 0 6px 20px -10px rgba(23, 22, 29, 0.14);
+  --elev-lift: 0 0 0 1px var(--c-line-strong), 0 2px 4px rgba(23, 22, 29, 0.06), 0 14px 32px -12px rgba(23, 22, 29, 0.22);
+  --elev-overlay: 0 0 0 1px var(--c-line), 0 24px 56px -16px rgba(23, 22, 29, 0.28);
+  --glow-done: 0 0 0 1px rgba(109, 79, 224, 0.35), 0 0 22px -8px rgba(109, 79, 224, 0.55);
+  --ring: 0 0 0 2px var(--c-canvas), 0 0 0 4px var(--c-focus);
+  --grain-opacity: 0.025;
+  --spotlight: rgba(139, 108, 246, 0.08);
+}
+
+.dark {
+  --c-canvas: #09090C;
+  --c-sunken: #060608;
+  --c-surface: #111116;
+  --c-raised: #18181F;
+  --c-overlay: #1E1E27;
+  --c-line: rgba(255, 255, 255, 0.07);
+  --c-line-strong: rgba(255, 255, 255, 0.13);
+  --c-fg: #EDEDF2;
+  --c-fg-muted: #A3A3B2;
+  --c-fg-subtle: #8A8A9A;
+  --c-fg-faint: #5C5C6B;
+  --c-key: #D9D3FF;
+  --c-key-bg: rgba(255, 255, 255, 0.04);
+  --c-key-line: rgba(255, 255, 255, 0.08);
+  --c-accent: #FF7A9C;
+  --c-accent-soft: rgba(242, 85, 125, 0.12);
+  --c-focus: #A894FF;
+  --c-selection: rgba(139, 108, 246, 0.3);
+  --c-hover: rgba(255, 255, 255, 0.045);
+  --c-press: rgba(255, 255, 255, 0.08);
+  --c-field: rgba(255, 255, 255, 0.03);
+
+  --c-status-todo: #8A8A9A;
+  --c-status-progress: #F7B23B;
+  --c-status-done: #A08AFF;
+  --c-prio-critical: #FF5C86;
+  --c-prio-high: #F7934C;
+  --c-prio-medium: #E8C468;
+  --c-prio-low: #7C7C8C;
+  --c-success: #3DD6A0;
+  --c-warning: #F7B23B;
+  --c-danger: #FF5C86;
+  --c-info: #7AA7FF;
+  --c-epic: #D98BE6;           /* 7.9:1 on surface */
+
+  /* Dark chart steps: the badge colours mixed 80% into the surface, which brings them into the
+     validator's lightness band (all checks pass; status worst CVD ΔE 17.7, types 14.5). */
+  --c-chart-todo: #6A6A7A;
+  --c-chart-progress: #C68206;
+  --c-chart-done: #8470D6;
+  --c-chart-bug: #CA4E6E;
+  --c-chart-feature: #6386CA;
+  --c-chart-task: #39AA82;
+
+  --elev-surface: 0 0 0 1px var(--c-line);
+  --elev-raised: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 0 0 1px var(--c-line), 0 1px 2px rgba(0, 0, 0, 0.5), 0 8px 24px -12px rgba(0, 0, 0, 0.7);
+  --elev-lift: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 0 0 1px var(--c-line-strong), 0 4px 8px rgba(0, 0, 0, 0.45), 0 18px 40px -14px rgba(0, 0, 0, 0.8);
+  --elev-overlay: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 0 0 1px var(--c-line-strong), 0 28px 72px -18px rgba(0, 0, 0, 0.85);
+  --glow-done: 0 0 0 1px rgba(160, 138, 255, 0.35), 0 0 26px -8px rgba(139, 108, 246, 0.7);
+  --grain-opacity: 0.045;
+  --spotlight: rgba(168, 148, 255, 0.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur-instant: 0ms; --dur-fast: 0ms; --dur-base: 0ms; --dur-slow: 0ms; --dur-set: 0ms; }
+}

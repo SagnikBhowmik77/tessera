@@ -1,0 +1,135 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tessera direction B: Terrazzo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0F0D0B;--surface:#171411;--raised:#1F1B17;--overlay:#26211C;--border:rgba(255,236,214,0.08);--borderStrong:rgba(255,236,214,0.14);--text:#F3EDE5;--muted:#A1968A;--faint:#6E655B;--r1:4px;--r2:8px;--r3:12px;--grad:linear-gradient(135deg,#E2683C 0%,#E2B23C 100%);--accent:#E2683C;--ui:'IBM Plex Sans',system-ui,sans-serif;--display:'Bricolage Grotesque',serif;--mono:'IBM Plex Mono',monospace}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--text);font:14px/1.45 var(--ui);-webkit-font-smoothing:antialiased;width:1280px}
+.grain{position:absolute;inset:0;pointer-events:none;opacity:0.07;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.app{display:grid;grid-template-columns:232px 1fr;height:800px;width:1280px;overflow:hidden;position:relative}
+aside{background:var(--surface);border-right:1px solid var(--border);padding:16px 12px;display:flex;flex-direction:column;gap:4px;position:relative}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 8px 14px;font:600 15px var(--ui)}
+.logo{width:22px;height:22px;display:grid;grid-template-columns:1fr 1fr;gap:2px}.logo i{border-radius:2px}
+.logo i:nth-child(1){background:#2FB38F}.logo i:nth-child(2){background:#E2B23C}.logo i:nth-child(3){background:var(--accent)}.logo i:nth-child(4){background:#2FB38F66}
+.search{display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 10px;border:1px solid var(--border);border-radius:var(--r1);color:var(--faint);font-size:13px;margin-bottom:10px;background:var(--bg)}
+kbd{font:500 11px var(--mono);color:var(--muted);border:1px solid var(--border);border-radius:4px;padding:1px 5px}
+.nav{display:flex;align-items:center;gap:10px;height:30px;padding:0 8px;border-radius:var(--r1);color:var(--muted);font-size:13px}
+.nav.on{background:var(--raised);color:var(--text);box-shadow:inset 0 0 0 1px var(--border)}
+.nav .sq{width:16px;height:16px;border-radius:4px;display:grid;place-items:center;font:600 8px var(--mono);color:#0009}
+.section{font:600 11px var(--ui);letter-spacing:.06em;text-transform:uppercase;color:var(--faint);padding:14px 8px 6px}
+main{display:flex;flex-direction:column;min-width:0;position:relative}
+.head{padding:22px 28px 0;display:flex;gap:20px;align-items:flex-start}
+.mosaic{display:grid;grid-template-columns:repeat(8,10px);gap:3px;padding:8px;border:1px solid var(--border);border-radius:var(--r2);background:var(--surface)}
+.mosaic i{width:10px;height:10px;border-radius:2px}.mosaic i.empty{border:1px dashed var(--borderStrong);background:none;box-shadow:none}
+.crumb{font-size:12px;color:var(--faint)}
+h1{font:44px/1 var(--display);font-weight:800;letter-spacing:-0.03em;margin:6px 0 4px}
+.sub{color:var(--muted);font-size:13px}
+.actions{margin-left:auto;display:flex;gap:8px;align-items:center}
+.btn{height:34px;padding:0 14px;border-radius:var(--r1);border:1px solid var(--borderStrong);background:var(--raised);color:var(--text);font:500 13px var(--ui);display:inline-flex;align-items:center;gap:8px}
+.btn.primary{border:0;color:#1A0D06;background:var(--accent);font-weight:600;box-shadow:0 1px 0 rgba(255,255,255,.25) inset,0 6px 20px -8px var(--accent)}
+.btn.primary kbd{border-color:rgba(0,0,0,.2);color:inherit}
+.tabs{display:flex;gap:2px;padding:16px 28px 0;border-bottom:1px solid var(--border);align-items:center}
+.tab{padding:8px 12px;font-size:13px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab.on{color:var(--text);border-color:var(--accent)}
+.tab.more{color:var(--faint)}.sep{width:1px;height:16px;background:var(--border);margin:0 8px}
+.board{display:grid;grid-template-columns:repeat(3,300px);gap:16px;padding:20px 28px;align-items:start}
+.col{border-radius:var(--r2);}
+.col header{display:flex;align-items:center;gap:8px;font:600 13px var(--ui);padding:4px 6px 10px}
+.dot{width:8px;height:8px;border-radius:50%}.count{font:500 11px var(--mono);color:var(--faint)}
+.card{background:var(--raised);border:1px solid var(--border);border-radius:var(--r2);padding:12px;margin-bottom:8px;box-shadow:0 1px 0 rgba(255,236,214,0.04) inset,0 2px 0 rgba(0,0,0,0.35)}
+.card.done{background:var(--surface);box-shadow:inset 0 2px 4px rgba(0,0,0,.35)}
+.card-top{display:flex;align-items:center;gap:8px}
+.key{font:500 11px var(--mono);padding:2px 6px;border-radius:3px;background:#E2683C1A;border:1px solid #E2683C40;color:#F5A47F}
+.pri{margin-left:auto;width:8px;height:8px;border-radius:2px;background:var(--pc);box-shadow:0 0 0 3px color-mix(in srgb,var(--pc) 18%,transparent)}
+.title{margin-top:8px;font:500 13.5px/1.4 var(--ui);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card.done .title{color:var(--muted)}
+.card-foot{display:flex;align-items:center;gap:8px;margin-top:10px}
+.labels{display:flex;gap:4px;flex-wrap:wrap;min-width:0}
+.label{font-size:11px;color:var(--muted);padding:1px 7px;border-radius:999px;border:1px solid var(--border)}
+.avatar{margin-left:auto;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font:600 9px var(--ui);background:var(--overlay);border:1px solid var(--borderStrong);color:var(--text);flex:none}
+.note{position:absolute;right:16px;bottom:12px;font:500 11px var(--mono);color:var(--faint)}
+.spec{width:1280px;padding:36px 40px 44px;display:grid;grid-template-columns:1.2fr 1fr 1.1fr;gap:36px;background:var(--surface);border-top:1px solid var(--border)}
+.spec h2{font:34px/1.1 var(--display);font-weight:800;letter-spacing:-0.03em;margin-bottom:10px}
+.spec h3{font:600 11px var(--ui);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:10px}
+.spec p{color:var(--muted);font-size:13px;line-height:1.55}
+.sw{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:12px}.sw div{height:44px;border-radius:var(--r1);border:1px solid var(--border);display:flex;align-items:flex-end;padding:4px;font:10px var(--mono);color:var(--muted)}
+.grad{height:10px;border-radius:999px;background:var(--grad);margin:4px 0 14px}
+.type .d{font:40px/1 var(--display);font-weight:800;letter-spacing:-0.03em}.type .u{font:500 15px var(--ui);margin:8px 0 4px}.type .m{font:500 13px var(--mono);color:var(--muted)}
+.lightbg{padding:16px;border-radius:var(--r3);background:#F4EFE7}
+.lightcard{padding:14px;border-radius:var(--r2);background:#FFFDF9;border:1px solid rgba(60,40,20,0.10);color:#1E1914;box-shadow:0 8px 30px -14px rgba(0,0,0,.35)}
+.lightcard .key{background:#FBE6DC;border:1px solid #F2C3AE;color:#A3401A}.lightcard .label{color:#6B6055;border-color:rgba(60,40,20,0.10)}
+</style></head><body>
+<div class="app">
+<aside><div class="grain"></div>
+  <div class="brand"><span class="logo"><i></i><i></i><i></i><i></i></span>Tessera</div>
+  <div class="search">Search or jump to… <kbd>Ctrl K</kbd></div>
+  <div class="nav">My work</div><div class="nav">Projects</div><div class="nav">Workspaces</div>
+  <div class="section">Your projects</div>
+  <div class="nav on"><span class="sq" style="background:#E2B23C">SH</span>Storefront</div>
+  <div class="nav"><span class="sq" style="background:#2FB38F">EM</span>Empty project</div>
+</aside>
+<main><div class="grain"></div>
+  <div class="head">
+    <div class="mosaic" title="One tile per ticket, coloured by status"><i style="background:#A1968A;background-image:radial-gradient(circle at 30% 30%,rgba(255,255,255,0.35) 0 1px,transparent 1.5px),radial-gradient(circle at 70% 60%,rgba(0,0,0,0.25) 0 1px,transparent 1.5px);background-size:7px 7px,9px 9px"></i><i style="background:#A1968A;background-image:radial-gradient(circle at 30% 30%,rgba(255,255,255,0.35) 0 1px,transparent 1.5px),radial-gradient(circle at 70% 60%,rgba(0,0,0,0.25) 0 1px,transparent 1.5px);background-size:7px 7px,9px 9px"></i><i style="background:#A1968A;background-image:radial-gradient(circle at 30% 30%,rgba(255,255,255,0.35) 0 1px,transparent 1.5px),radial-gradient(circle at 70% 60%,rgba(0,0,0,0.25) 0 1px,transparent 1.5px);background-size:7px 7px,9px 9px"></i><i style="background:#A1968A;background-image:radial-gradient(circle at 30% 30%,rgba(255,255,255,0.35) 0 1px,transparent 1.5px),radial-gradient(circle at 70% 60%,rgba(0,0,0,0.25) 0 1px,transparent 1.5px);background-size:7px 7px,9px 9px"></i><i style="background:#E2B23C;background-image:radial-gradient(circle at 30% 30%,rgba(255,255,255,0.35) 0 1px,transparent 1.5px),radial-gradient(circle at 70% 60%,rgba(0,0,0,0.25) 0 1px,transparent 1.5px);background-size:7px 7px,9px 9px"></i><i style="background:#E2B23C;background-image:radial-gradient(circle at 30% 30%,rgba(255,255,255,0.35) 0 1px,transparent 1.5px),radial-gradient(circle at 70% 60%,rgba(0,0,0,0.25) 0 1px,transparent 1.5px);background-size:7px 7px,9px 9px"></i><i style="background:#2FB38F;background-image:radial-gradient(circle at 30% 30%,rgba(255,255,255,0.35) 0 1px,transparent 1.5px),radial-gradient(circle at 70% 60%,rgba(0,0,0,0.25) 0 1px,transparent 1.5px);background-size:7px 7px,9px 9px"></i><i class="empty"></i><i class="empty"></i><i class="empty"></i><i class="empty"></i><i class="empty"></i><i class="empty"></i><i class="empty"></i><i class="empty"></i><i class="empty"></i></div>
+    <div><div class="crumb">Projects / Storefront</div><h1>Storefront</h1><div class="sub">7 tickets · 2 in progress · 1 done</div></div>
+    <div class="actions"><span class="btn">Time travel</span><span class="btn primary">New ticket <kbd>C</kbd></span></div>
+  </div>
+  <nav class="tabs"><span class="tab on">Board</span><span class="tab">List</span><span class="tab">Calendar</span><span class="tab">Timeline</span><span class="sep"></span><span class="tab">Sprints</span><span class="tab">Analytics</span><span class="tab more">More ▾</span><span class="tab" style="margin-left:auto">Settings</span></nav>
+  <div class="board">
+    <section class="col"><header><span class="dot" style="background:#A1968A"></span>To Do<span class="count">4</span></header>
+    
+    <article class="card">
+      <div class="card-top"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E5484D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 2 1.88 1.88M14.12 3.88 16 2M9 7.13v-1a3.003 3.003 0 1 1 6 0v1"/><path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6M12 20v-9M6.53 9C4.6 8.8 3 7.1 3 5M6 13H2M3 21c0-2.1 1.7-3.9 3.8-4M20.97 5c0 2.1-1.6 3.8-3.5 4M22 13h-4M17.2 17c2.1.1 3.8 1.9 3.8 4"/></svg><span class="key">SHOP-1</span><span class="pri" style="--pc:#E5484D" title="critical priority"></span></div>
+      <p class="title">Checkout button does nothing on Safari 17</p>
+      <div class="card-foot"><div class="labels"><span class="label">checkout</span><span class="label">safari</span></div><span class="avatar">অচ</span></div>
+    </article>
+    <article class="card">
+      <div class="card-top"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E5484D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 2 1.88 1.88M14.12 3.88 16 2M9 7.13v-1a3.003 3.003 0 1 1 6 0v1"/><path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6M12 20v-9M6.53 9C4.6 8.8 3 7.1 3 5M6 13H2M3 21c0-2.1 1.7-3.9 3.8-4M20.97 5c0 2.1-1.6 3.8-3.5 4M22 13h-4M17.2 17c2.1.1 3.8 1.9 3.8 4"/></svg><span class="key">SHOP-3</span><span class="pri" style="--pc:#E2B23C" title="medium priority"></span></div>
+      <p class="title">Cart badge shows the wrong count after removing an item from the mini cart while the recommendations carousel is still loading</p>
+      <div class="card-foot"><div class="labels"><span class="label">cart</span><span class="label">mobile</span><span class="label">performance</span><span class="label">+3</span></div></div>
+    </article>
+    <article class="card">
+      <div class="card-top"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A1968A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m9 12 2 2 4-4"/></svg><span class="key">SHOP-6</span><span class="pri" style="--pc:#E2B23C" title="medium priority"></span></div>
+      <p class="title">Search results page loads slowly</p>
+      <div class="card-foot"><div class="labels"><span class="label">performance</span></div></div>
+    </article>
+    <article class="card">
+      <div class="card-top"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E5484D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 2 1.88 1.88M14.12 3.88 16 2M9 7.13v-1a3.003 3.003 0 1 1 6 0v1"/><path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6M12 20v-9M6.53 9C4.6 8.8 3 7.1 3 5M6 13H2M3 21c0-2.1 1.7-3.9 3.8-4M20.97 5c0 2.1-1.6 3.8-3.5 4M22 13h-4M17.2 17c2.1.1 3.8 1.9 3.8 4"/></svg><span class="key">SHOP-7</span><span class="pri" style="--pc:#E2B23C" title="medium priority"></span></div>
+      <p class="title">Order confirmation email has a broken image</p>
+      <div class="card-foot"><div class="labels"><span class="label">email</span></div></div>
+    </article></section>
+    <section class="col"><header><span class="dot" style="background:#E2B23C"></span>In Progress<span class="count">2</span></header>
+    
+    <article class="card">
+      <div class="card-top"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2FB38F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.94 14.06 8.5 21l3.5-2 3.5 2-1.44-6.94"/><circle cx="12" cy="9" r="6"/></svg><span class="key">SHOP-2</span><span class="pri" style="--pc:#E2683C" title="high priority"></span></div>
+      <p class="title">Add Apple Pay to the payment step</p>
+      <div class="card-foot"><div class="labels"><span class="label">payments</span></div><span class="avatar">অচ</span></div>
+    </article>
+    <article class="card">
+      <div class="card-top"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#E5484D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8 2 1.88 1.88M14.12 3.88 16 2M9 7.13v-1a3.003 3.003 0 1 1 6 0v1"/><path d="M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6M12 20v-9M6.53 9C4.6 8.8 3 7.1 3 5M6 13H2M3 21c0-2.1 1.7-3.9 3.8-4M20.97 5c0 2.1-1.6 3.8-3.5 4M22 13h-4M17.2 17c2.1.1 3.8 1.9 3.8 4"/></svg><span class="key">SHOP-5</span><span class="pri" style="--pc:#E2683C" title="high priority"></span></div>
+      <p class="title">Coupon field rejects valid codes with lowercase letters</p>
+      <div class="card-foot"><div class="labels"><span class="label">checkout</span></div><span class="avatar">অচ</span></div>
+    </article></section>
+    <section class="col"><header><span class="dot" style="background:#2FB38F"></span>Done<span class="count">1</span></header>
+    
+    <article class="card done">
+      <div class="card-top"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A1968A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m9 12 2 2 4-4"/></svg><span class="key">SHOP-4</span><span class="pri" style="--pc:#8C8278" title="low priority"></span></div>
+      <p class="title">Write release notes for 2.4</p>
+      <div class="card-foot"><div class="labels"><span class="label">docs</span></div></div>
+    </article></section></div>
+  <div class="note">Direction B · design mockup · test tickets from the audit</div>
+</main>
+</div>
+<section class="spec">
+  <div><h3>Direction B</h3><h2>Terrazzo</h2><p>A warm studio floor of set stone chips: grounded, tactile and human. Warm neutrals with terracotta and jade, a bold grotesque for headings, and a little grain.</p><p style="margin-top:10px">Tiles are speckled stone chips; done tickets sit flush, set into the floor. Colour is warm and earthy instead of neon.</p></div>
+  <div><h3>Palette</h3>
+    <div class="sw"><div style="background:#0F0D0B">bg</div><div style="background:#171411">surface</div><div style="background:#1F1B17">raised</div><div style="background:#26211C">overlay</div><div style="background:#F3EDE5">text</div></div>
+    <div class="sw"><div style="background:#A1968A;color:#000a">todo</div><div style="background:#E2B23C;color:#000a">progress</div><div style="background:#2FB38F;color:#000a">done</div><div style="background:#E5484D;color:#000a">critical</div><div style="background:#E2683C;color:#000a">high</div></div>
+    <div class="grad"></div>
+    <h3>Type</h3><div class="type"><div class="d">Bricolage Grotesque</div><div class="u">IBM Plex Sans: Checkout button does nothing</div><div class="m">IBM Plex Mono: SHOP-1 · 4h 12m</div></div>
+  </div>
+  <div><h3>Light mode</h3><div class="lightbg"><div class="lightcard"><div class="card-top"><span class="key">SHOP-2</span></div><p class="title" style="color:#1E1914">Add Apple Pay to the payment step</p><div class="card-foot"><span class="label">payments</span></div></div></div>
+  <p style="margin-top:10px">Radius 4 / 8 / 12 px · flat set-in shadows and grain</p></div>
+</section>
+</body></html>

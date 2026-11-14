@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content="Issue tracking for teams who ship: boards, bug intelligence, flow analytics and live collaboration, in one window." />
+    <meta name="theme-color" content="#F6F5F1" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#09090C" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <title>Tessera</title>
+    <script>
+      // Apply the saved light/dark choice before the first paint, so the page never flashes.
+      try {
+        var t = localStorage.getItem('tessera.theme');
+        if (t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark');
+        // Signed in: the account's accent and density too (a copy kept by lib/preferences.js),
+        // but not on the public pages, which wear Tessera's look or the team's.
+        var look = JSON.parse(localStorage.getItem('tessera.look') || 'null');
+        if (look && localStorage.getItem('tessera.token') && !/^\/(report|track|roadmap|shared|status|invite)\//.test(location.pathname)) {
+          var h = document.documentElement;
+          if (look.accent) { h.classList.add('ds-accented'); h.style.setProperty('--accent-light', look.accent[0]); h.style.setProperty('--accent-dark', look.accent[1]); }
+          if (look.density) h.dataset.density = look.density;
+        }
+      } catch (e) {}
+    </script>
+    <style>
+      /* First load: the four tiles of the mark fly in and set into the logo (560 ms), drawn by the
+         HTML itself so it is there on the first paint, before any script. React replaces it. */
+      .boot { position: fixed; inset: 0; display: grid; place-items: center; background: #F6F5F1; }
+      html.dark .boot { background: #09090C; }
+      .boot rect { transform-box: fill-box; transform-origin: center; animation: boot-set 440ms cubic-bezier(.2, .8, .2, 1) both; }
+      .boot .t1 { --x: -9px; --y: -8px; --r: -10deg; }
+      .boot .t2 { --x: 9px; --y: -10px; --r: 8deg; animation-delay: 40ms; }
+      .boot .t3 { --x: -8px; --y: 9px; --r: 6deg; animation-delay: 80ms; }
+      .boot .t4 { --x: 10px; --y: 8px; --r: -8deg; animation-delay: 120ms; }
+      .boot-still rect { animation: none; }
+      @keyframes boot-set { from { opacity: 0; transform: translate(var(--x), var(--y)) rotate(var(--r)) scale(.55); } }
+      @media (prefers-reduced-motion: reduce) { .boot rect { animation: none; } }
+    </style>
+  </head>
+  <body>
+    <div id="root"><div class="boot" role="status" aria-label="Loading Tessera"><svg width="44" height="44" viewBox="0 0 32 32" aria-hidden="true"><defs><linearGradient id="boot-glass" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#F7B23B" /><stop offset="0.48" stop-color="#F2557D" /><stop offset="1" stop-color="#8B6CF6" /></linearGradient></defs><g fill="url(#boot-glass)"><rect class="t1" x="2" y="2" width="14" height="11" rx="3" /><rect class="t2" x="18" y="2" width="12" height="17" rx="3" /><rect class="t3" x="2" y="15" width="14" height="15" rx="3" /><rect class="t4" x="18" y="21" width="12" height="9" rx="3" /></g></svg></div></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

@@ -1,0 +1,61 @@
+# Render Blueprint for the Tessera API (one free web service). Secrets are not in this file: each
+# `sync: false` variable is entered once in the Render dashboard (Environment), with the values from
+# server/.env, except the addresses, which are the live ones. DEPLOY.md walks through it.
+services:
+  - type: web
+    name: tessera-api
+    runtime: node
+    plan: free
+    # Singapore is the closest Render region to the MongoDB Atlas cluster in Mumbai.
+    region: singapore
+    rootDir: server
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      # Render puts one proxy in front of the app; needed for real client IPs and rate limits.
+      - key: TRUST_PROXY
+        value: "1"
+      - key: APP_TIMEZONE
+        value: Asia/Kolkata
+      # Addresses: the web app (Vercel) and this API (Render). Filled in once both exist.
+      - key: APP_URL
+        sync: false
+      - key: CLIENT_ORIGIN
+        sync: false
+      - key: API_URL
+        sync: false
+      # Email goes through the relay on Vercel (Render's free tier blocks SMTP).
+      - key: MAIL_RELAY_URL
+        sync: false
+      - key: MAIL_RELAY_SECRET
+        sync: false
+      # Secrets.
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: VAPID_PUBLIC_KEY
+        sync: false
+      - key: VAPID_PRIVATE_KEY
+        sync: false
+      # Sign in with GitHub / Google. GitHub allows one callback per OAuth app, so production has its
+      # own GitHub OAuth app; the Google client gets the Render callback added next to the local one.
+      - key: GITHUB_OAUTH_CLIENT_ID
+        sync: false
+      - key: GITHUB_OAUTH_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_OAUTH_CLIENT_ID
+        sync: false
+      - key: GOOGLE_OAUTH_CLIENT_SECRET
+        sync: false
+      # Optional: Cloudflare Turnstile on the public bug-report page (off unless both are set).
+      - key: TURNSTILE_SITE_KEY
+        sync: false
+      - key: TURNSTILE_SECRET
+        sync: false
