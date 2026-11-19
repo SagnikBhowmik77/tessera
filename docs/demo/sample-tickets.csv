@@ -1,0 +1,9 @@
+Title,Type,Priority,Labels,Story points,Description
+Add Apple Pay to the payment step,feature,high,payments,5,Customers on iPhone ask for Apple Pay at checkout.
+Coupon field rejects lowercase codes,bug,medium,checkout,2,"Typing ""save10"" fails, ""SAVE10"" works."
+Show delivery date before payment,feature,high,checkout,3,Customers want to know when it arrives before paying.
+Order summary misaligned at 360px,bug,low,ui;mobile,1,The total wraps under the button on small phones.
+Upgrade the payments SDK to v5,task,high,payments,3,v4 stops being supported next quarter.
+Write runbook for payment outages,task,low,docs,2,What to check and who to call when payments fail.
+Gift card balance shows NaN,bug,critical,payments,2,Happens after applying two gift cards.
+Remember last used payment method,feature,medium,checkout,3,Pre-select the card or UPI used last time.

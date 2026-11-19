@@ -1,0 +1,9 @@
+TypeError: Cannot read properties of undefined (reading 'total')
+    at applyCoupon (/app/src/cart/coupons.js:48:23)
+    at checkout (/app/src/cart/checkout.js:112:9)
+    at Layer.handle [as handle_request] (/app/node_modules/express/lib/router/layer.js:95:5)
+    at next (/app/node_modules/express/lib/router/route.js:149:13)
+    at processTicksAndRejections (node:internal/process/task_queues:95:5)
+Request: POST /api/checkout  Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkZW1vLXVzZXIifQ.ZGVtby1zaWduYXR1cmU
+Customer: riya.demo@example.com
+DATABASE_URL=postgres://shop:demo-password-123@db.internal:5432/shop
