@@ -406,14 +406,18 @@ async function pushToIssue(project, ticket, events) {
 }
 onTicketEvents((project, ticket, events) => pushToIssue(project, ticket, events));
 
-// GitHub -> Tessera, from the webhook. Changes made by Tessera's own token are skipped (no loops).
+// GitHub -> Tessera, from the webhook. No loops, without looking at who sent it: the token is
+// usually the team's own account, the same one people file and close issues with. Tessera's own
+// changes come back as no-ops (the same title, the state the ticket already has), and the issues it
+// opens carry its "Tracked in Tessera" line, so they never turn into a second ticket.
+const TRACKED = /\n*---\n_Tracked in Tessera as [A-Z0-9]+-\d+\._\s*$/;
 export async function issueFromDelivery(project, event, payload) {
   if (!project.github?.issues?.sync || !['issues', 'issue_comment'].includes(event)) return null;
   const issue = payload.issue;
   if (!issue || issue.pull_request) return null;
-  if (payload.sender?.login && payload.sender.login === project.github.tokenLogin) return { skipped: 'own_change' };
   let ticket = await Ticket.findOne({ project: project._id, 'githubIssue.number': issue.number, deletedAt: null });
   if (event === 'issues' && payload.action === 'opened' && !ticket) {
+    if (TRACKED.test(String(issue.body ?? ''))) return { skipped: 'own_change' };
     const made = await ticketFromIssue(project, issue);
     return { created: made.key };
   }
@@ -423,7 +427,8 @@ export async function issueFromDelivery(project, event, payload) {
     const events = [];
     if (payload.action === 'edited') {
       if (payload.changes?.title && issue.title !== ticket.title) { events.push({ type: 'updated', field: 'title', from: ticket.title, to: issue.title }); ticket.title = String(issue.title).slice(0, 200); }
-      if (payload.changes?.body) { events.push({ type: 'updated', field: 'description', from: null, to: null }); ticket.description = String(issue.body ?? '').replace(/\n*---\n_Tracked in Tessera as [A-Z0-9]+-\d+\._\s*$/, '').slice(0, 20_000); }
+      const body = String(issue.body ?? '').replace(TRACKED, '').slice(0, 20_000);
+      if (payload.changes?.body && body !== (ticket.description ?? '')) { events.push({ type: 'updated', field: 'description', from: null, to: null }); ticket.description = body; }
       if (events.length) {
         await ticket.save();
         await TicketEvent.insertMany(events.map((e) => ({ project: project._id, ticket: ticket._id, actor: null, source: 'github', at, ...e })));

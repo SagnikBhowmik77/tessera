@@ -7,7 +7,7 @@ import { startTestServer } from './helpers.js';
 import { __setTransport } from '../src/mailer.js';
 import { __setGithubFetch } from '../src/services/githubapi.js';
 import { flushHooks } from '../src/services/hooks.js';
-import { Comment, Project, Ticket, User } from '../src/models/index.js';
+import { Comment, Project, Ticket, TicketEvent, User } from '../src/models/index.js';
 
 let t;
 let calls = [];
@@ -211,9 +211,11 @@ test('GitHub issues both ways: import, push title/state, take edits and comments
   const patches = calls.filter((c) => c.method === 'PATCH').map((c) => c.body);
   assert.deepEqual(patches, [{ title: 'Login loops on Safari' }, { state: 'closed', state_reason: 'completed' }]);
 
-  // GitHub -> Tessera; our own changes are skipped.
-  const own = await hook(ctx, 'issues', { action: 'reopened', issue: issue(11, 'Login loops on Safari'), sender: { login: 'tessera-bot' }, repository: { full_name: REPO } });
-  assert.deepEqual(own.body.issue, { skipped: 'own_change' });
+  // GitHub -> Tessera. Tessera's own close coming back is a no-op: no second move in the history.
+  const moves = async () => TicketEvent.countDocuments({ ticket: first._id, type: 'status_changed' });
+  const movesBefore = await moves();
+  await hook(ctx, 'issues', { action: 'closed', issue: issue(11, 'Login loops on Safari', { state: 'closed' }), sender: { login: 'tessera-bot' }, repository: { full_name: REPO } });
+  assert.equal(await moves(), movesBefore);
   await hook(ctx, 'issues', { action: 'reopened', issue: issue(11, 'Login loops on Safari'), sender: { login: 'ana' }, repository: { full_name: REPO } });
   await hook(ctx, 'issues', { action: 'edited', changes: { title: { from: 'x' } }, issue: issue(11, 'Login loops on Safari 18'), sender: { login: 'ana' }, repository: { full_name: REPO } });
   await hook(ctx, 'issue_comment', { action: 'created', issue: issue(11, 'x'), comment: { body: 'Still happens for me', user: { login: 'ana' }, html_url: `https://github.com/${REPO}/issues/11#c1` }, sender: { login: 'ana' }, repository: { full_name: REPO } });
@@ -229,4 +231,13 @@ test('GitHub issues both ways: import, push title/state, take edits and comments
   const made = await t.api('POST', `${ctx.url}/tickets/3/github/issue`, { token: ctx.dev.token });
   assert.equal(made.body.githubIssue.number, 13);
   assert.match(calls.find((c) => c.method === 'POST').body.body, new RegExp(`Tracked in Tessera as ${ctx.project.key}-3`));
+
+  // An issue Tessera opened never becomes a second ticket, even if GitHub's event beats the save.
+  const echo = await hook(ctx, 'issues', { action: 'opened', issue: issue(16, 'Made in Tessera', { body: `Steps\n\n---\n_Tracked in Tessera as ${ctx.project.key}-3._` }), sender: { login: 'tessera-bot' }, repository: { full_name: REPO } });
+  assert.deepEqual(echo.body.issue, { skipped: 'own_change' });
+  // The token's owner is a person too: what they open and close on GitHub reaches Tessera.
+  const mine = await hook(ctx, 'issues', { action: 'opened', issue: issue(17, 'Filed by the token owner'), sender: { login: 'tessera-bot' }, repository: { full_name: REPO } });
+  assert.deepEqual(mine.body.issue, { created: `${ctx.project.key}-4` });
+  await hook(ctx, 'issues', { action: 'closed', issue: issue(17, 'Filed by the token owner', { state: 'closed' }), sender: { login: 'tessera-bot' }, repository: { full_name: REPO } });
+  assert.equal((await Ticket.findOne({ project: ctx.project.id, number: 4 }).lean()).status, 'done');
 });
